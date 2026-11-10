@@ -3,6 +3,7 @@ import { TimerPreset } from '../types/timer';
 import { DEFAULT_PRESETS } from '../data/defaultPresets';
 import { formatMinutesSeconds } from '../utils/timeFormat';
 import { X, Check, Flame, Trophy, Award, Smile, Zap, Infinity } from 'lucide-react';
+import logoUrl from '../assets/true-bjj-logo-white.png';
 
 interface PresetSelectorProps {
   isOpen: boolean;
@@ -42,7 +43,7 @@ export const PresetSelector: React.FC<PresetSelectorProps> = ({
         {/* Header */}
         <div className="flex items-center justify-between pb-4 border-b border-zinc-800">
           <div className="flex items-center gap-3">
-            <img src="/true-bjj-logo-white.png" alt="True BJJ" className="w-8 h-8 object-contain" />
+            <img src={logoUrl} alt="True BJJ" className="w-8 h-8 object-contain" />
             <div>
               <h3 className="text-xl font-bold text-white flex items-center gap-2">
                 Modalidades de Treino (True BJJ)

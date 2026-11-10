@@ -2,6 +2,7 @@ import React from 'react';
 import { TimerPhase } from '../types/timer';
 import { formatMinutesSeconds, formatTotalElapsed } from '../utils/timeFormat';
 import { Swords, Coffee, AlertTriangle, Hourglass } from 'lucide-react';
+import logoUrl from '../assets/true-bjj-logo-white.png';
 
 interface BigDisplayProps {
   phase: TimerPhase;
@@ -80,7 +81,7 @@ export const BigDisplay: React.FC<BigDisplayProps> = ({
           glowColor: 'shadow-[0_0_100px_rgba(168,85,247,0.3)]',
           badgeBg: 'bg-purple-500/20 text-purple-300 border-purple-500/40',
           progressBarColor: 'bg-purple-500',
-          icon: <img src="/true-bjj-logo-white.png" alt="True BJJ" className="w-8 h-8 sm:w-10 sm:h-10 object-contain drop-shadow" />,
+          icon: <img src={logoUrl} alt="True BJJ" className="w-8 h-8 sm:w-10 sm:h-10 object-contain drop-shadow" />,
         };
       default: // idle
         return {
@@ -91,7 +92,7 @@ export const BigDisplay: React.FC<BigDisplayProps> = ({
           glowColor: 'shadow-none',
           badgeBg: 'bg-zinc-800 text-zinc-300 border-zinc-700',
           progressBarColor: 'bg-zinc-600',
-          icon: <img src="/true-bjj-logo-white.png" alt="True BJJ" className="w-8 h-8 sm:w-10 sm:h-10 object-contain opacity-90 drop-shadow" />,
+          icon: <img src={logoUrl} alt="True BJJ" className="w-8 h-8 sm:w-10 sm:h-10 object-contain opacity-90 drop-shadow" />,
         };
     }
   };
@@ -168,7 +169,7 @@ export const BigDisplay: React.FC<BigDisplayProps> = ({
       {/* Marca d'água oficial True BJJ integrada ao fundo do tatame */}
       <div className="absolute inset-0 flex items-center justify-center pointer-events-none select-none z-0 overflow-hidden">
         <img
-          src="/true-bjj-logo-white.png"
+          src={logoUrl}
           alt=""
           className={`w-[65vw] max-w-[420px] max-h-[420px] object-contain transition-all duration-700 ${
             phase === 'finished'

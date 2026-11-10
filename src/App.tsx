@@ -8,6 +8,7 @@ import { PresetSelector } from './components/PresetSelector';
 import { SettingsModal } from './components/SettingsModal';
 import { TvRemoteGuide } from './components/TvRemoteGuide';
 import { Eye, Flame } from 'lucide-react';
+import logoUrl from './assets/true-bjj-logo-white.png';
 
 const STORAGE_KEY_CONFIG = 'bjj_timer_saved_config';
 const STORAGE_KEY_PRESET_ID = 'bjj_timer_active_preset_id';
@@ -95,7 +96,7 @@ export function App() {
         <div className="flex items-center gap-2.5 sm:gap-3.5">
           <div className="relative flex items-center justify-center p-1 rounded-2xl bg-zinc-900/80 border border-zinc-800/80 shadow-md">
             <img
-              src="/true-bjj-logo-white.png"
+              src={logoUrl}
               alt="True BJJ Logo"
               className="w-9 h-9 sm:w-11 sm:h-11 object-contain filter drop-shadow-[0_0_8px_rgba(255,255,255,0.25)]"
             />
