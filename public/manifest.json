@@ -1,0 +1,19 @@
+{
+  "name": "True BJJ - Timer Oficial de Tatame",
+  "short_name": "True BJJ Timer",
+  "description": "Cronômetro oficial para treinos de Jiu-Jitsu da True BJJ em TV, celular e computador",
+  "start_url": "/",
+  "display": "fullscreen",
+  "orientation": "any",
+  "background_color": "#09090b",
+  "theme_color": "#09090b",
+  "icons": [
+    {
+      "src": "/favicon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any maskable"
+    }
+  ]
+}
+
