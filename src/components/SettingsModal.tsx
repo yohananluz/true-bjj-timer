@@ -25,6 +25,7 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
   const [restSeconds, setRestSeconds] = useState<number>(config.restTime % 60);
   const [prepareSeconds, setPrepareSeconds] = useState<number>(config.prepareTime);
   const [warningSeconds, setWarningSeconds] = useState<number>(config.warningTime);
+  const [voiceEnabled, setVoiceEnabled] = useState<boolean>(soundService.getVoiceEnabled());
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -175,6 +176,34 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
                 <option value={30}>Últimos 30s</option>
               </select>
             </div>
+          </div>
+
+          {/* Opção da Voz do Árbitro */}
+          <div className="pt-2 border-t border-zinc-800 flex items-center justify-between">
+            <div>
+              <span className="block text-zinc-200 text-xs sm:text-sm font-semibold">
+                🎙️ Voz do Árbitro em Português
+              </span>
+              <span className="text-zinc-500 text-[11px] block">
+                Comandos de voz: "Combate!", "Dez segundos!" e "Parou!"
+              </span>
+            </div>
+            <button
+              type="button"
+              onClick={() => {
+                const next = !voiceEnabled;
+                setVoiceEnabled(next);
+                soundService.setVoiceEnabled(next);
+                if (next) soundService.speak('Combate!');
+              }}
+              className={`px-3 py-1.5 rounded-xl border font-bold text-xs transition active:scale-95 ${
+                voiceEnabled
+                  ? 'bg-emerald-500/20 border-emerald-500/50 text-emerald-300'
+                  : 'bg-zinc-800 border-zinc-700 text-zinc-400'
+              }`}
+            >
+              {voiceEnabled ? 'ATIVADO' : 'DESATIVADO'}
+            </button>
           </div>
 
           {/* Teste Rápido de Sons do Tatame */}
