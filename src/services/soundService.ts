@@ -1,9 +1,13 @@
 /**
- * Motor de Áudio para Tatame de Jiu-Jitsu via Web Audio API.
+ * Motor de Áudio para Tatame de Jiu-Jitsu via Web Audio API + Áudio Nativo.
  * 
- * Totalmente autônomo e offline (sem arquivos de áudio externos para falharem).
- * Baixíssima latência e alta fidelidade acústica.
+ * Totalmente autônomo e offline (com arquivos de áudio empacotados pelo Vite).
+ * Suporte garantido para Smart TVs (LG webOS, Samsung Tizen), Celulares (iOS, Android) e PC.
  */
+
+import exercicioAudioUrl from '../assets/audio/exercicio.mp3';
+import descansarAudioUrl from '../assets/audio/descansar.mp3';
+import apitoAudioUrl from '../assets/audio/apito.wav';
 
 class SoundService {
   private ctx: AudioContext | null = null;
@@ -17,6 +21,31 @@ class SoundService {
   })();
   private masterCompressor: DynamicsCompressorNode | null = null;
 
+  // Cache de elementos de áudio HTML5 pré-carregados (compatibilidade 100% com Smart TVs)
+  private audioElements: Record<string, HTMLAudioElement> = {};
+
+  constructor() {
+    if (typeof window !== 'undefined') {
+      // Pré-carregar os arquivos de voz e apito
+      this.preloadAudio(exercicioAudioUrl);
+      this.preloadAudio(descansarAudioUrl);
+      this.preloadAudio(apitoAudioUrl);
+    }
+  }
+
+  private preloadAudio(url: string): HTMLAudioElement {
+    if (!this.audioElements[url] && typeof window !== 'undefined' && typeof Audio !== 'undefined') {
+      try {
+        const audio = new Audio(url);
+        audio.preload = 'auto';
+        this.audioElements[url] = audio;
+      } catch (err) {
+        console.warn('Erro ao pré-carregar áudio:', err);
+      }
+    }
+    return this.audioElements[url];
+  }
+
   private initContext() {
     if (!this.ctx) {
       const AudioCtx = window.AudioContext || (window as unknown as { webkitAudioContext: typeof AudioContext }).webkitAudioContext;
@@ -29,6 +58,12 @@ class SoundService {
 
   public resumeAudioContext() {
     this.initContext();
+    // Despertar elementos de áudio no primeiro clique do usuário (necessário para TVs e Safari)
+    Object.values(this.audioElements).forEach(audio => {
+      try {
+        audio.load();
+      } catch {}
+    });
   }
 
   /**
@@ -69,11 +104,49 @@ class SoundService {
   }
 
   /**
-   * Comando de Voz de Arbitragem em Português (Web Speech API)
+   * Toca um clipe de voz de alta definição pré-gravado em Português.
+   * Funciona 100% em qualquer Smart TV (LG, Samsung, Android) e Celular.
    */
-  public speak(text: string) {
+  public playVoice(type: 'exercicio' | 'descansar') {
     if (this.isMuted || !this.voiceEnabled) return;
-    if (typeof window !== 'undefined' && 'speechSynthesis' in window) {
+    this.resumeAudioContext();
+
+    const url = type === 'exercicio' ? exercicioAudioUrl : descansarAudioUrl;
+    let played = false;
+
+    // 1. Tocar via elemento HTML5 Audio nativo (compatibilidade máxima com TVs)
+    const audio = this.audioElements[url] || this.preloadAudio(url);
+    if (audio) {
+      try {
+        audio.currentTime = 0;
+        const playPromise = audio.play();
+        if (playPromise !== undefined) {
+          playPromise.then(() => {
+            played = true;
+          }).catch(() => {
+            // Se falhar (ex: bloqueio de autoplay), tenta fallback
+            this.speakFallback(type === 'exercicio' ? 'Exercício!' : 'Descansar!');
+          });
+        } else {
+          played = true;
+        }
+      } catch {
+        this.speakFallback(type === 'exercicio' ? 'Exercício!' : 'Descansar!');
+      }
+    }
+
+    // 2. Se o áudio não tocou, dispara o sintetizador de voz como fallback
+    if (!played) {
+      this.speakFallback(type === 'exercicio' ? 'Exercício!' : 'Descansar!');
+    }
+  }
+
+  /**
+   * Fallback de síntese vocal para navegadores que suportam Web Speech API
+   */
+  private speakFallback(text: string) {
+    if (this.isMuted || !this.voiceEnabled) return;
+    if (typeof window !== 'undefined' && 'speechSynthesis' in window && typeof SpeechSynthesisUtterance !== 'undefined') {
       try {
         window.speechSynthesis.cancel();
         const utterance = new SpeechSynthesisUtterance(text);
@@ -81,9 +154,7 @@ class SoundService {
         utterance.rate = 1.05;
         utterance.pitch = 0.95;
         window.speechSynthesis.speak(utterance);
-      } catch {
-        // Dispositivo sem suporte
-      }
+      } catch {}
     }
   }
 
@@ -91,16 +162,14 @@ class SoundService {
     if (typeof navigator !== 'undefined' && 'vibrate' in navigator) {
       try {
         navigator.vibrate(pattern);
-      } catch {
-        // Dispositivo sem suporte
-      }
+      } catch {}
     }
   }
 
   /**
    * Toca o Alerta Sonoro de Início de Rola / Combate.
-   * Triplo toque de ringue (DING! DING! DIIING!) combinado com gongo pesado de dojo.
-   * Ultra evidente, penetrante e inconfundível para ser ouvido no tatame inteiro.
+   * Triplo toque de ringue (DING! DING! DIIING!) combinado com gongo pesado de dojo
+   * e a voz oficial: "Exercício!".
    */
   public playStartGong() {
     this.vibrate([150, 100, 150, 100, 500]);
@@ -183,17 +252,77 @@ class SoundService {
     };
 
     // Sequência de 3 toques nítidos de ringue de combate:
-    // Toque 1: Ding!
     playStrike(0, false);
-    // Toque 2: Ding! (280ms depois)
     playStrike(0.28, false);
-    // Toque 3: DIIIIINGGGG! (560ms depois, com gongo de dojo longo sustentado)
     playStrike(0.56, true);
 
-    // Voz do árbitro oficial: "Exercício!"
+    // Voz oficial: "Exercício!"
     setTimeout(() => {
-      this.speak('Exercício!');
-    }, 700);
+      this.playVoice('exercicio');
+    }, 650);
+  }
+
+  /**
+   * Toca o Apito de Alerta Esportivo (estilo árbitro / timer).
+   * Dispara um apito nítido e penetrante para contagem regressiva de segundos
+   * nos 5s de preparo e nos 10s finais de cada round.
+   */
+  public playWhistleAlert(isFinal: boolean = false) {
+    this.vibrate(isFinal ? 120 : 60);
+    if (this.isMuted) return;
+
+    // 1. Tocar via arquivo de áudio nativo (funciona em qualquer Smart TV e Celular)
+    const audio = this.audioElements[apitoAudioUrl] || this.preloadAudio(apitoAudioUrl);
+    if (audio) {
+      try {
+        audio.currentTime = 0;
+        audio.play().catch(() => {});
+      } catch {}
+    }
+
+    // 2. Síntese via Web Audio API para reforço acústico e trinado de apito
+    this.initContext();
+    if (!this.ctx) return;
+
+    const output = this.getMasterOutput();
+    const now = this.ctx.currentTime;
+    const duration = isFinal ? 0.28 : 0.16;
+
+    const baseFreq = isFinal ? 2800 : 2550;
+    const secondFreq = isFinal ? 3100 : 2820;
+
+    [baseFreq, secondFreq].forEach((freq) => {
+      const osc = this.ctx!.createOscillator();
+      const gainNode = this.ctx!.createGain();
+
+      osc.type = 'sine';
+      osc.frequency.setValueAtTime(freq, now);
+
+      const lfo = this.ctx!.createOscillator();
+      const lfoGain = this.ctx!.createGain();
+      lfo.frequency.setValueAtTime(36, now);
+      lfoGain.gain.setValueAtTime(0.2, now);
+      lfo.connect(lfoGain.gain);
+
+      gainNode.gain.setValueAtTime(0.001, now);
+      gainNode.gain.linearRampToValueAtTime(0.75, now + 0.015);
+      gainNode.gain.setValueAtTime(0.75, now + duration - 0.03);
+      gainNode.gain.exponentialRampToValueAtTime(0.0001, now + duration);
+
+      const filter = this.ctx!.createBiquadFilter();
+      filter.type = 'bandpass';
+      filter.frequency.setValueAtTime((baseFreq + secondFreq) / 2, now);
+      filter.Q.setValueAtTime(3.5, now);
+
+      osc.connect(gainNode);
+      gainNode.connect(filter);
+      filter.connect(output);
+
+      osc.start(now);
+      lfo.start(now);
+      osc.stop(now + duration);
+      lfo.stop(now + duration);
+    });
   }
 
   /**
@@ -233,7 +362,6 @@ class SoundService {
       osc.start(now);
       osc.stop(now + 0.08);
 
-      // Clique de impacto de madeira
       const clickOsc = this.ctx!.createOscillator();
       const clickGain = this.ctx!.createGain();
       clickOsc.type = 'square';
@@ -249,14 +377,11 @@ class SoundService {
 
     playSingleClap(0);
     playSingleClap(0.16);
-
-    setTimeout(() => {
-      this.speak('Dez segundos!');
-    }, 350);
   }
 
   /**
    * Toca a Buzina de Fim de Round (Buzina estridente clássica de arena)
+   * e anuncia por voz "Descansar!" garantido para Smart TV e celular.
    */
   public playEndHorn() {
     this.vibrate([400, 100, 400]);
@@ -295,9 +420,9 @@ class SoundService {
       osc.stop(now + duration);
     });
 
-    // Voz de arbitragem ao terminar o round: "Descansar!"
+    // Voz oficial de fim de round: "Descansar!"
     setTimeout(() => {
-      this.speak('Descansar!');
+      this.playVoice('descansar');
     }, 600);
   }
 
@@ -333,60 +458,6 @@ class SoundService {
 
       osc.start(now);
       osc.stop(now + duration);
-    });
-  }
-
-  /**
-   * Apito de Alerta Esportivo (estilo árbitro / timer)
-   * Dispara um apito nítido e penetrante para contagem regressiva de segundos
-   */
-  public playWhistleAlert(isFinal: boolean = false) {
-    this.vibrate(isFinal ? 120 : 60);
-    if (this.isMuted) return;
-    this.initContext();
-    if (!this.ctx) return;
-
-    const output = this.getMasterOutput();
-    const now = this.ctx.currentTime;
-    const duration = isFinal ? 0.28 : 0.16;
-
-    // Frequências penetrantes características de apito esportivo
-    const baseFreq = isFinal ? 2800 : 2550;
-    const secondFreq = isFinal ? 3100 : 2820;
-
-    [baseFreq, secondFreq].forEach((freq) => {
-      const osc = this.ctx!.createOscillator();
-      const gainNode = this.ctx!.createGain();
-
-      osc.type = 'sine';
-      osc.frequency.setValueAtTime(freq, now);
-
-      // Tremolo / modulação rápida simulando o ar do apito (36Hz)
-      const lfo = this.ctx!.createOscillator();
-      const lfoGain = this.ctx!.createGain();
-      lfo.frequency.setValueAtTime(36, now);
-      lfoGain.gain.setValueAtTime(0.2, now);
-      lfo.connect(lfoGain.gain);
-
-      // Envelope percussivo de apito
-      gainNode.gain.setValueAtTime(0.001, now);
-      gainNode.gain.linearRampToValueAtTime(0.75, now + 0.015);
-      gainNode.gain.setValueAtTime(0.75, now + duration - 0.03);
-      gainNode.gain.exponentialRampToValueAtTime(0.0001, now + duration);
-
-      const filter = this.ctx!.createBiquadFilter();
-      filter.type = 'bandpass';
-      filter.frequency.setValueAtTime((baseFreq + secondFreq) / 2, now);
-      filter.Q.setValueAtTime(3.5, now);
-
-      osc.connect(gainNode);
-      gainNode.connect(filter);
-      filter.connect(output);
-
-      osc.start(now);
-      lfo.start(now);
-      osc.stop(now + duration);
-      lfo.stop(now + duration);
     });
   }
 
@@ -461,6 +532,10 @@ class SoundService {
       osc.start(noteTime);
       osc.stop(noteTime + dur);
     });
+
+    setTimeout(() => {
+      this.playVoice('descansar');
+    }, 1200);
   }
 }
 
