@@ -177,9 +177,12 @@ export function useBjjTimer(initialConfig: TimerConfig) {
   }, [isRunning, isPaused, phase, config.warningTime, currentRound, handlePhaseCompletion]);
 
   // Iniciar timer
-  const start = useCallback(async () => {
-    const success = await wakeLockService.requestLock();
-    setWakeLockActive(success);
+  const start = useCallback(() => {
+    // Inicializar e desuspender áudio sincronamente com o clique na TV/celular
+    soundService.resumeAudioContext();
+
+    // Requisitar Wake Lock em segundo plano sem travar execução na Smart TV
+    wakeLockService.requestLock().then(setWakeLockActive).catch(() => {});
 
     setIsRunning(true);
     setIsPaused(false);
@@ -209,6 +212,7 @@ export function useBjjTimer(initialConfig: TimerConfig) {
 
   // Retomar
   const resume = useCallback(() => {
+    soundService.resumeAudioContext();
     if (!isRunning || !isPaused) return;
     endTimeRef.current = Date.now() + remainingMsRef.current;
     setIsPaused(false);
@@ -216,6 +220,7 @@ export function useBjjTimer(initialConfig: TimerConfig) {
 
   // Alternar Play/Pause
   const togglePlayPause = useCallback(() => {
+    soundService.resumeAudioContext();
     if (!isRunning || phase === 'idle' || phase === 'finished') {
       start();
     } else if (isPaused) {
@@ -326,40 +331,82 @@ export function useBjjTimer(initialConfig: TimerConfig) {
         return;
       }
 
-      switch (e.code) {
-        case 'Space':
-          e.preventDefault();
-          togglePlayPause();
-          break;
-        case 'KeyR':
-          reset();
-          break;
-        case 'KeyN':
-        case 'ArrowRight':
-          skipNext();
-          break;
-        case 'KeyP':
-        case 'ArrowLeft':
-          skipPrevious();
-          break;
-        case 'KeyM':
-          toggleMute();
-          break;
-        case 'Equal': // '+'
-        case 'NumpadAdd':
-          addMinute();
-          break;
-        case 'Minus': // '-'
-        case 'NumpadSubtract':
-          subtractMinute();
-          break;
-        case 'KeyF':
-          if (!document.fullscreenElement) {
-            document.documentElement.requestFullscreen().catch(() => {});
-          } else {
-            document.exitFullscreen().catch(() => {});
-          }
-          break;
+      const code = e.code || '';
+      const key = e.key || '';
+      const keyCode = e.keyCode || 0;
+
+      // Play / Pause: Barra de Espaço, teclas de controle remoto de TV (Play/Pause/OK)
+      if (
+        code === 'Space' ||
+        key === ' ' ||
+        code === 'MediaPlayPause' ||
+        key === 'MediaPlayPause' ||
+        code === 'MediaPlay' ||
+        key === 'MediaPlay' ||
+        key === 'Play' ||
+        key === 'Pause' ||
+        keyCode === 179 ||
+        keyCode === 19
+      ) {
+        e.preventDefault();
+        togglePlayPause();
+        return;
+      }
+
+      // Tecla Enter no controle da Smart TV: se o foco não estiver em outro botão interativo, aciona Play/Pause
+      if (
+        (code === 'Enter' || key === 'Enter' || keyCode === 13) &&
+        (!document.activeElement || document.activeElement === document.body || document.activeElement.tagName === 'MAIN')
+      ) {
+        e.preventDefault();
+        togglePlayPause();
+        return;
+      }
+
+      // Resetar Treino (Tecla R)
+      if (code === 'KeyR' || key === 'r' || key === 'R') {
+        reset();
+        return;
+      }
+
+      // Próximo Round / Pular (Tecla N) - NÃO interceptar setas do controle para permitir navegação
+      if (code === 'KeyN' || key === 'n' || key === 'N') {
+        skipNext();
+        return;
+      }
+
+      // Round Anterior (Tecla P)
+      if (code === 'KeyP' || key === 'p' || key === 'P') {
+        skipPrevious();
+        return;
+      }
+
+      // Mutar / Desmutar (Tecla M)
+      if (code === 'KeyM' || key === 'm' || key === 'M') {
+        toggleMute();
+        return;
+      }
+
+      // +1 Minuto
+      if (code === 'Equal' || key === '+' || code === 'NumpadAdd') {
+        addMinute();
+        return;
+      }
+
+      // -1 Minuto
+      if (code === 'Minus' || key === '-' || code === 'NumpadSubtract') {
+        subtractMinute();
+        return;
+      }
+
+      // Tela Cheia (Tecla F)
+      if (code === 'KeyF' || key === 'f' || key === 'F') {
+        if (!document.fullscreenElement) {
+          document.documentElement.requestFullscreen().catch(() => {});
+        } else {
+          document.exitFullscreen().catch(() => {});
+        }
+        return;
       }
     };
 

@@ -14,10 +14,11 @@ export const TvRemoteGuide: React.FC = () => {
           <Keyboard className="w-3.5 h-3.5 text-emerald-400" />
           <span>Atalhos (TV & Teclado):</span>
         </span>
-        <span><kbd className="px-1.5 py-0.5 rounded bg-zinc-800 text-zinc-200 font-mono">Espaço / OK</kbd> Play/Pause</span>
+        <span><kbd className="px-1.5 py-0.5 rounded bg-zinc-800 text-zinc-200 font-mono">OK / Espaço</kbd> Play/Pause</span>
+        <span><kbd className="px-1.5 py-0.5 rounded bg-zinc-800 text-zinc-200 font-mono">Setas ⬅️ ➡️</kbd> Navegar</span>
         <span><kbd className="px-1.5 py-0.5 rounded bg-zinc-800 text-zinc-200 font-mono">F</kbd> Tela Cheia</span>
-        <span><kbd className="px-1.5 py-0.5 rounded bg-zinc-800 text-zinc-200 font-mono">N / ➡️</kbd> Próximo Round</span>
-        <span><kbd className="px-1.5 py-0.5 rounded bg-zinc-800 text-zinc-200 font-mono">P / ⬅️</kbd> Voltar Round</span>
+        <span><kbd className="px-1.5 py-0.5 rounded bg-zinc-800 text-zinc-200 font-mono">N</kbd> Próximo Round</span>
+        <span><kbd className="px-1.5 py-0.5 rounded bg-zinc-800 text-zinc-200 font-mono">P</kbd> Voltar Round</span>
         <span><kbd className="px-1.5 py-0.5 rounded bg-zinc-800 text-zinc-200 font-mono">R</kbd> Reiniciar</span>
         <span><kbd className="px-1.5 py-0.5 rounded bg-zinc-800 text-zinc-200 font-mono">+</kbd> / <kbd className="px-1.5 py-0.5 rounded bg-zinc-800 text-zinc-200 font-mono">-</kbd> +1m / -1m</span>
         <span><kbd className="px-1.5 py-0.5 rounded bg-zinc-800 text-zinc-200 font-mono">M</kbd> Mutar</span>

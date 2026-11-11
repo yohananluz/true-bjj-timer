@@ -76,8 +76,9 @@ export const Controls: React.FC<ControlsProps> = ({
       {/* Grupo Esquerda: Presets & Configurações */}
       <div className="flex items-center gap-2">
         <button
+          type="button"
           onClick={onOpenPresets}
-          className="flex items-center gap-2 px-3 sm:px-4 py-2.5 rounded-2xl bg-zinc-900 hover:bg-zinc-800 text-zinc-300 hover:text-white border border-zinc-800 transition active:scale-95 text-xs sm:text-sm font-semibold shadow-sm"
+          className="cursor-pointer pointer-events-auto flex items-center gap-2 px-3 sm:px-4 py-2.5 rounded-2xl bg-zinc-900 hover:bg-zinc-800 text-zinc-300 hover:text-white border border-zinc-800 transition active:scale-95 text-xs sm:text-sm font-semibold shadow-sm focus:outline-none focus:ring-4 focus:ring-emerald-400 focus:scale-105"
           title="Selecionar Modalidades de Jiu-Jitsu"
         >
           <Sparkles className="w-4 h-4 text-emerald-400" />
@@ -85,8 +86,9 @@ export const Controls: React.FC<ControlsProps> = ({
         </button>
 
         <button
+          type="button"
           onClick={onOpenSettings}
-          className="flex items-center gap-2 px-3 sm:px-4 py-2.5 rounded-2xl bg-zinc-900 hover:bg-zinc-800 text-zinc-300 hover:text-white border border-zinc-800 transition active:scale-95 text-xs sm:text-sm font-semibold shadow-sm"
+          className="cursor-pointer pointer-events-auto flex items-center gap-2 px-3 sm:px-4 py-2.5 rounded-2xl bg-zinc-900 hover:bg-zinc-800 text-zinc-300 hover:text-white border border-zinc-800 transition active:scale-95 text-xs sm:text-sm font-semibold shadow-sm focus:outline-none focus:ring-4 focus:ring-emerald-400 focus:scale-105"
           title="Ajustar Tempos Personalizados"
         >
           <Sliders className="w-4 h-4 text-blue-400" />
@@ -98,8 +100,9 @@ export const Controls: React.FC<ControlsProps> = ({
       <div className="flex items-center gap-2 sm:gap-3 mx-auto">
         {/* Voltar / Reiniciar Round */}
         <button
+          type="button"
           onClick={onSkipPrevious}
-          className="p-3 sm:p-3.5 rounded-2xl bg-zinc-900 hover:bg-zinc-800 text-zinc-400 hover:text-white border border-zinc-800 transition active:scale-95"
+          className="cursor-pointer pointer-events-auto p-3 sm:p-3.5 rounded-2xl bg-zinc-900 hover:bg-zinc-800 text-zinc-400 hover:text-white border border-zinc-800 transition active:scale-95 focus:outline-none focus:ring-4 focus:ring-emerald-400 focus:scale-105"
           title="Reiniciar Round Atual / Voltar (P)"
         >
           <SkipBack className="w-5 h-5 sm:w-6 sm:h-6" />
@@ -107,8 +110,9 @@ export const Controls: React.FC<ControlsProps> = ({
 
         {/* Botão Gigante Play/Pause */}
         <button
+          type="button"
           onClick={onTogglePlayPause}
-          className={`px-6 sm:px-8 py-3 sm:py-4 rounded-2xl font-black text-base sm:text-lg flex items-center gap-3 transition-all duration-150 active:scale-95 shadow-lg ${
+          className={`cursor-pointer pointer-events-auto px-6 sm:px-8 py-3 sm:py-4 rounded-2xl font-black text-base sm:text-lg flex items-center gap-3 transition-all duration-150 active:scale-95 shadow-lg focus:outline-none focus:ring-4 focus:ring-emerald-400 focus:scale-105 ${
             isPlayState
               ? 'bg-emerald-500 hover:bg-emerald-400 text-zinc-950 shadow-emerald-500/20'
               : 'bg-amber-500 hover:bg-amber-400 text-zinc-950 shadow-amber-500/20'
@@ -130,8 +134,9 @@ export const Controls: React.FC<ControlsProps> = ({
 
         {/* Avançar Próximo Round */}
         <button
+          type="button"
           onClick={onSkipNext}
-          className="p-3 sm:p-3.5 rounded-2xl bg-zinc-900 hover:bg-zinc-800 text-zinc-400 hover:text-white border border-zinc-800 transition active:scale-95"
+          className="cursor-pointer pointer-events-auto p-3 sm:p-3.5 rounded-2xl bg-zinc-900 hover:bg-zinc-800 text-zinc-400 hover:text-white border border-zinc-800 transition active:scale-95 focus:outline-none focus:ring-4 focus:ring-emerald-400 focus:scale-105"
           title="Próximo Round / Pular Descanso (N)"
         >
           <SkipForward className="w-5 h-5 sm:w-6 sm:h-6" />
@@ -139,8 +144,9 @@ export const Controls: React.FC<ControlsProps> = ({
 
         {/* Resetar Treino */}
         <button
+          type="button"
           onClick={onReset}
-          className="p-3 sm:p-3.5 rounded-2xl bg-zinc-900 hover:bg-zinc-800 text-zinc-400 hover:text-rose-400 border border-zinc-800 transition active:scale-95"
+          className="cursor-pointer pointer-events-auto p-3 sm:p-3.5 rounded-2xl bg-zinc-900 hover:bg-zinc-800 text-zinc-400 hover:text-rose-400 border border-zinc-800 transition active:scale-95 focus:outline-none focus:ring-4 focus:ring-emerald-400 focus:scale-105"
           title="Resetar Treino Completo (R)"
         >
           <RotateCcw className="w-5 h-5 sm:w-6 sm:h-6" />
@@ -151,9 +157,10 @@ export const Controls: React.FC<ControlsProps> = ({
       <div className="flex items-center gap-1.5 sm:gap-2">
         {/* +1 Minuto (Muito comum em rolas de academia) */}
         <button
+          type="button"
           onClick={onAddMinute}
           disabled={phase === 'idle' || phase === 'finished'}
-          className="px-2.5 sm:px-3 py-2 rounded-xl bg-zinc-900 hover:bg-zinc-800 disabled:opacity-40 text-emerald-400 border border-zinc-800 transition active:scale-95 text-xs sm:text-sm font-bold flex items-center gap-1"
+          className="cursor-pointer pointer-events-auto px-2.5 sm:px-3 py-2 rounded-xl bg-zinc-900 hover:bg-zinc-800 disabled:opacity-40 text-emerald-400 border border-zinc-800 transition active:scale-95 text-xs sm:text-sm font-bold flex items-center gap-1 focus:outline-none focus:ring-2 focus:ring-emerald-400"
           title="Adicionar 1 minuto ao rola (+)"
         >
           <Plus className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
@@ -162,9 +169,10 @@ export const Controls: React.FC<ControlsProps> = ({
 
         {/* -1 Minuto */}
         <button
+          type="button"
           onClick={onSubtractMinute}
           disabled={phase === 'idle' || phase === 'finished'}
-          className="px-2.5 sm:px-3 py-2 rounded-xl bg-zinc-900 hover:bg-zinc-800 disabled:opacity-40 text-zinc-400 border border-zinc-800 transition active:scale-95 text-xs sm:text-sm font-bold flex items-center gap-1"
+          className="cursor-pointer pointer-events-auto px-2.5 sm:px-3 py-2 rounded-xl bg-zinc-900 hover:bg-zinc-800 disabled:opacity-40 text-zinc-400 border border-zinc-800 transition active:scale-95 text-xs sm:text-sm font-bold flex items-center gap-1 focus:outline-none focus:ring-2 focus:ring-emerald-400"
           title="Subtrair 1 minuto do rola (-)"
         >
           <Minus className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
@@ -173,8 +181,9 @@ export const Controls: React.FC<ControlsProps> = ({
 
         {/* Mudo / Som */}
         <button
+          type="button"
           onClick={onToggleMute}
-          className={`p-2.5 sm:p-3 rounded-2xl border transition active:scale-95 ${
+          className={`cursor-pointer pointer-events-auto p-2.5 sm:p-3 rounded-2xl border transition active:scale-95 focus:outline-none focus:ring-4 focus:ring-emerald-400 ${
             isMuted 
               ? 'bg-rose-950/40 border-rose-800/60 text-rose-400' 
               : 'bg-zinc-900 hover:bg-zinc-800 border-zinc-800 text-zinc-300'
@@ -186,8 +195,9 @@ export const Controls: React.FC<ControlsProps> = ({
 
         {/* Tela Cheia (TV / Monitor) */}
         <button
+          type="button"
           onClick={toggleFullscreen}
-          className="p-2.5 sm:p-3 rounded-2xl bg-zinc-900 hover:bg-zinc-800 text-zinc-300 border border-zinc-800 transition active:scale-95"
+          className="cursor-pointer pointer-events-auto p-2.5 sm:p-3 rounded-2xl bg-zinc-900 hover:bg-zinc-800 text-zinc-300 border border-zinc-800 transition active:scale-95 focus:outline-none focus:ring-4 focus:ring-emerald-400"
           title="Modo Tela Cheia para Smart TV / Monitor (F)"
         >
           {isFullscreen ? <Minimize className="w-5 h-5" /> : <Maximize className="w-5 h-5" />}

@@ -26,8 +26,14 @@ class WakeLockService {
   public async requestLock(): Promise<boolean> {
     this.isRequested = true;
     try {
-      if ('wakeLock' in navigator && navigator.wakeLock) {
-        this.sentinel = await (navigator.wakeLock as { request: (type: string) => Promise<WakeLockSentinel> }).request('screen');
+      if (typeof navigator !== 'undefined' && 'wakeLock' in navigator && navigator.wakeLock) {
+        // Timeout de proteção para Smart TVs (LG webOS / Tizen) onde request('screen') pode travar
+        const lockPromise = (navigator.wakeLock as { request: (type: string) => Promise<WakeLockSentinel> }).request('screen');
+        const timeoutPromise = new Promise<never>((_, reject) =>
+          setTimeout(() => reject(new Error('WakeLock timeout')), 800)
+        );
+
+        this.sentinel = await Promise.race([lockPromise, timeoutPromise]);
         this.sentinel.addEventListener('release', () => {
           this.sentinel = null;
         });

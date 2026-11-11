@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 import { useBjjTimer } from './hooks/useBjjTimer';
 import { DEFAULT_PRESETS } from './data/defaultPresets';
 import { TimerPreset, TimerConfig } from './types/timer';
@@ -77,17 +77,6 @@ export function App() {
     }
   };
 
-  // Prevenir comportamento padrão de arrasto em telas touch
-  useEffect(() => {
-    const preventTouch = (e: TouchEvent) => {
-      if (e.touches.length > 1) {
-        e.preventDefault(); // prevenir zoom indesejado no tatame
-      }
-    };
-    document.addEventListener('touchstart', preventTouch, { passive: false });
-    return () => document.removeEventListener('touchstart', preventTouch);
-  }, []);
-
   return (
     <main className="w-full h-full flex flex-col justify-between p-3 sm:p-5 md:p-6 bg-zinc-950 text-white overflow-hidden box-border">
       {/* Top Bar: Identidade BJJ, Preset Ativo e Status de Wake Lock */}
@@ -154,7 +143,7 @@ export function App() {
       </section>
 
       {/* Controles do Professor / Atleta */}
-      <footer className="w-full flex flex-col gap-2 z-20">
+      <footer className="w-full flex flex-col gap-2 z-30 relative pointer-events-auto">
         <Controls
           phase={state.phase}
           isRunning={state.isRunning}
