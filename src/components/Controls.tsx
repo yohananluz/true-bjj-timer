@@ -72,9 +72,9 @@ export const Controls: React.FC<ControlsProps> = ({
   const isPlayState = !isRunning || isPaused || phase === 'idle' || phase === 'finished';
 
   return (
-    <div className="w-full flex flex-wrap items-center justify-between gap-3 sm:gap-4 pt-3 sm:pt-4">
-      {/* Grupo Esquerda: Presets & Configurações */}
-      <div className="flex items-center gap-2">
+    <div className="w-full flex flex-col sm:flex-row items-center justify-between gap-2.5 sm:gap-4 pt-1 sm:pt-4 flex-shrink-0">
+      {/* Desktop / TV: Grupo Esquerda (Modalidades & Config) */}
+      <div className="hidden sm:flex items-center gap-2">
         <button
           type="button"
           onClick={onOpenPresets}
@@ -82,7 +82,7 @@ export const Controls: React.FC<ControlsProps> = ({
           title="Selecionar Modalidades de Jiu-Jitsu"
         >
           <Sparkles className="w-4 h-4 text-emerald-400" />
-          <span className="hidden sm:inline">Modalidades</span>
+          <span>Modalidades</span>
         </button>
 
         <button
@@ -92,18 +92,19 @@ export const Controls: React.FC<ControlsProps> = ({
           title="Ajustar Tempos Personalizados"
         >
           <Sliders className="w-4 h-4 text-blue-400" />
-          <span className="hidden sm:inline">Configurar</span>
+          <span>Configurar</span>
         </button>
       </div>
 
-      {/* Grupo Central: Botões Principais de Ação do Tatame */}
-      <div className="flex items-center gap-2 sm:gap-3 mx-auto">
+      {/* Grupo Principal de Ação do Tatame (Mobile & Desktop) */}
+      <div className="flex items-center justify-center gap-2 sm:gap-3 w-full sm:w-auto">
         {/* Voltar / Reiniciar Round */}
         <button
           type="button"
           onClick={onSkipPrevious}
-          className="cursor-pointer pointer-events-auto p-3 sm:p-3.5 rounded-2xl bg-zinc-900 hover:bg-zinc-800 text-zinc-400 hover:text-white border border-zinc-800 transition active:scale-95 focus:outline-none focus:ring-4 focus:ring-emerald-400 focus:scale-105"
+          className="cursor-pointer pointer-events-auto p-2.5 sm:p-3.5 rounded-2xl bg-zinc-900 hover:bg-zinc-800 text-zinc-400 hover:text-white border border-zinc-800 transition active:scale-95 focus:outline-none focus:ring-4 focus:ring-emerald-400 focus:scale-105"
           title="Reiniciar Round Atual / Voltar (P)"
+          aria-label="Voltar round"
         >
           <SkipBack className="w-5 h-5 sm:w-6 sm:h-6" />
         </button>
@@ -112,7 +113,7 @@ export const Controls: React.FC<ControlsProps> = ({
         <button
           type="button"
           onClick={onTogglePlayPause}
-          className={`cursor-pointer pointer-events-auto px-6 sm:px-8 py-3 sm:py-4 rounded-2xl font-black text-base sm:text-lg flex items-center gap-3 transition-all duration-150 active:scale-95 shadow-lg focus:outline-none focus:ring-4 focus:ring-emerald-400 focus:scale-105 ${
+          className={`cursor-pointer pointer-events-auto px-6 sm:px-8 py-3 sm:py-4 rounded-2xl font-black text-sm sm:text-lg flex items-center gap-2.5 sm:gap-3 transition-all duration-150 active:scale-95 shadow-lg focus:outline-none focus:ring-4 focus:ring-emerald-400 focus:scale-105 ${
             isPlayState
               ? 'bg-emerald-500 hover:bg-emerald-400 text-zinc-950 shadow-emerald-500/20'
               : 'bg-amber-500 hover:bg-amber-400 text-zinc-950 shadow-amber-500/20'
@@ -121,12 +122,12 @@ export const Controls: React.FC<ControlsProps> = ({
         >
           {isPlayState ? (
             <>
-              <Play className="w-6 h-6 sm:w-7 sm:h-7 fill-current" />
+              <Play className="w-5 h-5 sm:w-7 sm:h-7 fill-current" />
               <span>INICIAR</span>
             </>
           ) : (
             <>
-              <Pause className="w-6 h-6 sm:w-7 sm:h-7 fill-current" />
+              <Pause className="w-5 h-5 sm:w-7 sm:h-7 fill-current" />
               <span>PAUSAR</span>
             </>
           )}
@@ -136,8 +137,9 @@ export const Controls: React.FC<ControlsProps> = ({
         <button
           type="button"
           onClick={onSkipNext}
-          className="cursor-pointer pointer-events-auto p-3 sm:p-3.5 rounded-2xl bg-zinc-900 hover:bg-zinc-800 text-zinc-400 hover:text-white border border-zinc-800 transition active:scale-95 focus:outline-none focus:ring-4 focus:ring-emerald-400 focus:scale-105"
+          className="cursor-pointer pointer-events-auto p-2.5 sm:p-3.5 rounded-2xl bg-zinc-900 hover:bg-zinc-800 text-zinc-400 hover:text-white border border-zinc-800 transition active:scale-95 focus:outline-none focus:ring-4 focus:ring-emerald-400 focus:scale-105"
           title="Próximo Round / Pular Descanso (N)"
+          aria-label="Avançar round"
         >
           <SkipForward className="w-5 h-5 sm:w-6 sm:h-6" />
         </button>
@@ -146,16 +148,86 @@ export const Controls: React.FC<ControlsProps> = ({
         <button
           type="button"
           onClick={onReset}
-          className="cursor-pointer pointer-events-auto p-3 sm:p-3.5 rounded-2xl bg-zinc-900 hover:bg-zinc-800 text-zinc-400 hover:text-rose-400 border border-zinc-800 transition active:scale-95 focus:outline-none focus:ring-4 focus:ring-emerald-400 focus:scale-105"
+          className="cursor-pointer pointer-events-auto p-2.5 sm:p-3.5 rounded-2xl bg-zinc-900 hover:bg-zinc-800 text-zinc-400 hover:text-rose-400 border border-zinc-800 transition active:scale-95 focus:outline-none focus:ring-4 focus:ring-emerald-400 focus:scale-105"
           title="Resetar Treino Completo (R)"
+          aria-label="Resetar treino"
         >
           <RotateCcw className="w-5 h-5 sm:w-6 sm:h-6" />
         </button>
       </div>
 
-      {/* Grupo Direita: Ajustes Rápidos (+/- 1 Min, Mute, Tela Cheia) */}
-      <div className="flex items-center gap-1.5 sm:gap-2">
-        {/* +1 Minuto (Muito comum em rolas de academia) */}
+      {/* Modo Mobile: Barra de Ferramentas Secundárias (Visível apenas em telas pequenas) */}
+      <div className="flex sm:hidden items-center justify-between w-full max-w-sm gap-1.5 px-1">
+        <button
+          type="button"
+          onClick={onOpenPresets}
+          className="flex-1 flex items-center justify-center gap-1 py-2 px-2 rounded-xl bg-zinc-900 hover:bg-zinc-800 text-zinc-300 border border-zinc-800 text-[11px] font-semibold active:scale-95"
+          title="Modalidades"
+        >
+          <Sparkles className="w-3.5 h-3.5 text-emerald-400" />
+          <span>Modalidades</span>
+        </button>
+
+        <button
+          type="button"
+          onClick={onOpenSettings}
+          className="flex-1 flex items-center justify-center gap-1 py-2 px-2 rounded-xl bg-zinc-900 hover:bg-zinc-800 text-zinc-300 border border-zinc-800 text-[11px] font-semibold active:scale-95"
+          title="Configurar"
+        >
+          <Sliders className="w-3.5 h-3.5 text-blue-400" />
+          <span>Configurar</span>
+        </button>
+
+        <button
+          type="button"
+          onClick={onAddMinute}
+          disabled={phase === 'idle' || phase === 'finished'}
+          className="py-2 px-2.5 rounded-xl bg-zinc-900 hover:bg-zinc-800 disabled:opacity-40 text-emerald-400 border border-zinc-800 text-xs font-bold flex items-center gap-0.5 active:scale-95"
+          title="+1 Minuto"
+        >
+          <Plus className="w-3 h-3" />
+          <span>1m</span>
+        </button>
+
+        <button
+          type="button"
+          onClick={onSubtractMinute}
+          disabled={phase === 'idle' || phase === 'finished'}
+          className="py-2 px-2.5 rounded-xl bg-zinc-900 hover:bg-zinc-800 disabled:opacity-40 text-zinc-400 border border-zinc-800 text-xs font-bold flex items-center gap-0.5 active:scale-95"
+          title="-1 Minuto"
+        >
+          <Minus className="w-3 h-3" />
+          <span>1m</span>
+        </button>
+
+        <button
+          type="button"
+          onClick={onToggleMute}
+          className={`p-2 rounded-xl border text-xs active:scale-95 ${
+            isMuted 
+              ? 'bg-rose-950/40 border-rose-800/60 text-rose-400' 
+              : 'bg-zinc-900 border-zinc-800 text-zinc-300'
+          }`}
+          title={isMuted ? 'Desmutar' : 'Mutar'}
+          aria-label={isMuted ? 'Desmutar' : 'Mutar'}
+        >
+          {isMuted ? <VolumeX className="w-4 h-4" /> : <Volume2 className="w-4 h-4" />}
+        </button>
+
+        <button
+          type="button"
+          onClick={toggleFullscreen}
+          className="p-2 rounded-xl bg-zinc-900 border border-zinc-800 text-zinc-300 text-xs active:scale-95"
+          title="Tela Cheia"
+          aria-label="Tela cheia"
+        >
+          {isFullscreen ? <Minimize className="w-4 h-4" /> : <Maximize className="w-4 h-4" />}
+        </button>
+      </div>
+
+      {/* Desktop / TV: Grupo Direita (+/- 1m, Mute, Tela Cheia) */}
+      <div className="hidden sm:flex items-center gap-1.5 sm:gap-2">
+        {/* +1 Minuto */}
         <button
           type="button"
           onClick={onAddMinute}

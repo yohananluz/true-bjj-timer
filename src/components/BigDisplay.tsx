@@ -107,10 +107,10 @@ export const BigDisplay: React.FC<BigDisplayProps> = ({
   return (
     <div
       onClick={onDisplayClick}
-      className={`relative flex-1 w-full flex flex-col items-center justify-between p-4 sm:p-6 md:p-8 rounded-3xl border-2 transition-all duration-300 select-none cursor-pointer bg-zinc-950/80 backdrop-blur-md overflow-hidden ${theme.borderColor} ${theme.glowColor}`}
+      className={`relative flex-1 w-full flex flex-col items-center justify-between p-3 sm:p-6 md:p-8 rounded-2xl sm:rounded-3xl border-2 transition-all duration-300 select-none cursor-pointer bg-zinc-950/80 backdrop-blur-md overflow-hidden min-h-0 ${theme.borderColor} ${theme.glowColor}`}
     >
       {/* Barra de Progresso Superior */}
-      <div className="absolute top-0 left-0 right-0 h-2 bg-zinc-900/60 overflow-hidden">
+      <div className="absolute top-0 left-0 right-0 h-1.5 sm:h-2 bg-zinc-900/60 overflow-hidden">
         <div
           className={`h-full transition-all duration-300 ease-linear ${theme.progressBarColor}`}
           style={{ width: `${progressPercent}%` }}
@@ -118,52 +118,53 @@ export const BigDisplay: React.FC<BigDisplayProps> = ({
       </div>
 
       {/* Cabeçalho do Display: Indicador de Rounds e Tempo Total */}
-      <div className="w-full flex items-center justify-between z-10">
+      <div className="w-full flex items-center justify-between z-10 gap-2">
         {/* Badge do Round Atual */}
-        <div className={`flex items-center gap-2 sm:gap-3 px-4 sm:px-6 py-2 rounded-2xl border text-sm sm:text-lg md:text-xl font-bold tracking-wider uppercase ${theme.badgeBg}`}>
+        <div className={`flex items-center gap-1.5 sm:gap-3 px-3 sm:px-6 py-1.5 sm:py-2 rounded-xl sm:rounded-2xl border text-xs sm:text-lg md:text-xl font-bold tracking-wider uppercase ${theme.badgeBg}`}>
           {theme.icon}
           <span>
             {totalRounds > 0 ? (
-              <>Round <strong className="text-white text-lg sm:text-2xl">{currentRound}</strong> / {totalRounds}</>
+              <>Round <strong className="text-white text-base sm:text-2xl">{currentRound}</strong> / {totalRounds}</>
             ) : (
-              <>Round <strong className="text-white text-lg sm:text-2xl">{currentRound}</strong> (Contínuo)</>
+              <>Round <strong className="text-white text-base sm:text-2xl">{currentRound}</strong> (Contínuo)</>
             )}
           </span>
         </div>
 
         {/* Indicador de Pausa ou Tempo Total */}
-        <div className="flex items-center gap-3">
+        <div className="flex items-center gap-2 sm:gap-3">
           {isPaused && (
-            <span className="px-3 py-1 sm:px-4 sm:py-1.5 rounded-xl bg-amber-500/20 text-amber-300 border border-amber-500/50 text-xs sm:text-sm md:text-base font-bold animate-pulse">
+            <span className="px-2.5 py-1 sm:px-4 sm:py-1.5 rounded-xl bg-amber-500/20 text-amber-300 border border-amber-500/50 text-[11px] sm:text-sm md:text-base font-bold animate-pulse">
               PAUSADO
             </span>
           )}
           <div className="text-right">
-            <span className="text-zinc-500 text-xs sm:text-sm uppercase block font-semibold">Tempo Total</span>
-            <span className="text-zinc-300 font-mono text-sm sm:text-lg font-bold">{formatTotalElapsed(totalElapsed)}</span>
+            <span className="text-zinc-500 text-[10px] sm:text-sm uppercase block font-semibold">Tempo Total</span>
+            <span className="text-zinc-300 font-mono text-xs sm:text-lg font-bold">{formatTotalElapsed(totalElapsed)}</span>
           </div>
         </div>
       </div>
 
       {/* Miolo Central: Dígitos Massivos de Tempo */}
-      <div className="flex-1 flex flex-col items-center justify-center my-auto z-10 w-full">
+      <div className="flex-1 flex flex-col items-center justify-center my-auto z-10 w-full min-h-0">
         {/* Título de Fase Grande */}
-        <h2 className={`text-xl sm:text-3xl md:text-4xl lg:text-5xl font-black uppercase tracking-widest mb-1 text-center ${theme.textColor}`}>
+        <h2 className={`text-base sm:text-3xl md:text-4xl lg:text-5xl font-black uppercase tracking-wider sm:tracking-widest mb-0.5 sm:mb-1 text-center ${theme.textColor}`}>
           {theme.title}
         </h2>
-        <p className="text-zinc-400 text-xs sm:text-sm md:text-base tracking-wide mb-2 sm:mb-4 text-center">
+        <p className="text-zinc-400 text-[11px] sm:text-sm md:text-base tracking-wide mb-1 sm:mb-4 text-center line-clamp-1 sm:line-clamp-none">
           {theme.subtext}
         </p>
 
-        {/* Cronômetro com Fonte Gigante para TV */}
-        <div className={`font-mono font-black tracking-tighter leading-none select-none text-center drop-shadow-2xl transition-transform duration-200 ${theme.textColor} text-[22vw] sm:text-[18vw] md:text-[15vw] lg:text-[14vw]`}>
+        {/* Cronômetro com Fonte Gigante para TV e adaptada para celular */}
+        <div className={`font-mono font-black tracking-tight leading-none select-none text-center drop-shadow-2xl transition-transform duration-200 ${theme.textColor} text-[19vw] sm:text-[18vw] md:text-[15vw] lg:text-[14vw]`}>
           {formatMinutesSeconds(timeRemaining)}
         </div>
       </div>
 
-      {/* Rodapé Interno do Display: Instrução sutil para tela de TV */}
-      <div className="w-full text-center text-zinc-500 text-xs sm:text-sm font-medium z-10">
-        Toque ou clique na tela para {isPaused || phase === 'idle' ? 'Iniciar' : 'Pausar'} • Pressione <kbd className="px-1.5 py-0.5 rounded bg-zinc-800 text-zinc-300 font-mono border border-zinc-700">Espaço</kbd>
+      {/* Rodapé Interno do Display: Instrução sutil */}
+      <div className="w-full text-center text-zinc-500 text-[11px] sm:text-xs md:text-sm font-medium z-10">
+        Toque na tela para {isPaused || phase === 'idle' ? 'Iniciar' : 'Pausar'}
+        <span className="hidden sm:inline"> • Pressione <kbd className="px-1.5 py-0.5 rounded bg-zinc-800 text-zinc-300 font-mono border border-zinc-700">Espaço</kbd></span>
       </div>
 
       {/* Marca d'água oficial True BJJ integrada ao fundo do tatame */}

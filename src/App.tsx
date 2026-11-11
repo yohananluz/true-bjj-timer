@@ -78,9 +78,9 @@ export function App() {
   };
 
   return (
-    <main className="w-full h-full flex flex-col justify-between p-3 sm:p-5 md:p-6 bg-zinc-950 text-white overflow-hidden box-border">
+    <main className="w-full min-h-[100dvh] h-[100dvh] max-h-[100dvh] flex flex-col justify-between p-2.5 sm:p-5 md:p-6 pb-[max(0.6rem,env(safe-area-inset-bottom))] pt-[max(0.6rem,env(safe-area-inset-top))] bg-zinc-950 text-white overflow-hidden box-border">
       {/* Top Bar: Identidade BJJ, Preset Ativo e Status de Wake Lock */}
-      <header className="w-full flex items-center justify-between pb-2 sm:pb-3 border-b border-zinc-900 z-20">
+      <header className="w-full flex items-center justify-between pb-2 sm:pb-3 border-b border-zinc-900 z-20 flex-shrink-0">
         {/* Logo / Marca Oficial True BJJ */}
         <div className="flex items-center gap-2.5 sm:gap-3.5">
           <div className="relative flex items-center justify-center p-1 rounded-2xl bg-zinc-900/80 border border-zinc-800/80 shadow-md">

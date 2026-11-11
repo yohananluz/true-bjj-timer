@@ -7,7 +7,7 @@ export const TvRemoteGuide: React.FC = () => {
   if (!isVisible) return null;
 
   return (
-    <div className="w-full flex items-center justify-between px-3 sm:px-4 py-1.5 bg-zinc-900/60 border border-zinc-800/80 rounded-xl text-zinc-400 text-[11px] sm:text-xs">
+    <div className="hidden md:flex w-full items-center justify-between px-3 sm:px-4 py-1.5 bg-zinc-900/60 border border-zinc-800/80 rounded-xl text-zinc-400 text-[11px] sm:text-xs">
       <div className="flex items-center gap-2 sm:gap-4 overflow-x-auto whitespace-nowrap scrollbar-none py-0.5">
         <span className="flex items-center gap-1 font-semibold text-zinc-300">
           <Tv className="w-3.5 h-3.5 text-blue-400" />
