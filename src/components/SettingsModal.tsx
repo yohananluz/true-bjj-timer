@@ -185,14 +185,14 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
               </div>
             </div>
 
-            {/* Opção da Voz do Árbitro */}
+            {/* Opção da Voz Masculina Oficial do Árbitro */}
             <div className="pt-2 border-t border-zinc-800 flex items-center justify-between">
               <div>
                 <span className="block text-zinc-200 text-xs sm:text-sm font-semibold">
-                  🎙️ Voz de Comando em Português
+                  🎙️ Voz Masculina Oficial (Tatame)
                 </span>
                 <span className="text-zinc-500 text-[11px] block">
-                  Comandos de voz: "Exercício!" e "Descansar!"
+                  Voz masculina imponente: "Exercício!" e "Descansar!"
                 </span>
               </div>
               <button
@@ -217,7 +217,7 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
             <div className="pt-2 border-t border-zinc-800">
               <label className="block text-zinc-300 text-xs font-semibold mb-2 flex items-center gap-1.5">
                 <Volume2 className="w-4 h-4 text-emerald-400" />
-                <span>Testar Alertas Sonoros e Vozes</span>
+                <span>Testar Voz Masculina e Alertas do Tatame</span>
               </label>
               <div className="grid grid-cols-2 gap-2">
                 <button

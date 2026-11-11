@@ -23,10 +23,12 @@ class SoundService {
 
   // Cache de elementos de áudio HTML5 pré-carregados (compatibilidade 100% com Smart TVs)
   private audioElements: Record<string, HTMLAudioElement> = {};
+  // Cache de AudioBuffers decodificados para Web Audio API (volume amplificado e latência zero)
+  private audioBuffers: Record<string, AudioBuffer> = {};
 
   constructor() {
     if (typeof window !== 'undefined') {
-      // Pré-carregar os arquivos de voz e apito
+      // Pré-carregar os arquivos de voz masculina e apito
       this.preloadAudio(exercicioAudioUrl);
       this.preloadAudio(descansarAudioUrl);
       this.preloadAudio(apitoAudioUrl);
@@ -44,6 +46,20 @@ class SoundService {
       }
     }
     return this.audioElements[url];
+  }
+
+  private async loadBuffer(url: string) {
+    if (this.audioBuffers[url] || typeof window === 'undefined') return;
+    try {
+      this.initContext();
+      if (!this.ctx) return;
+      const resp = await fetch(url);
+      const arrayBuf = await resp.arrayBuffer();
+      const decoded = await this.ctx.decodeAudioData(arrayBuf);
+      this.audioBuffers[url] = decoded;
+    } catch {
+      // Fallback permanece com HTMLAudioElement
+    }
   }
 
   private initContext() {
@@ -64,6 +80,10 @@ class SoundService {
         audio.load();
       } catch {}
     });
+    // Decodificar buffers para áudio de alta pressão sonora
+    this.loadBuffer(exercicioAudioUrl);
+    this.loadBuffer(descansarAudioUrl);
+    this.loadBuffer(apitoAudioUrl);
   }
 
   /**
@@ -104,8 +124,8 @@ class SoundService {
   }
 
   /**
-   * Toca um clipe de voz de alta definição pré-gravado em Português.
-   * Funciona 100% em qualquer Smart TV (LG, Samsung, Android) e Celular.
+   * Toca a voz oficial masculina imponente ("Exercício!" / "Descansar!").
+   * Funciona com máxima fidelidade em qualquer Smart TV (LG, Samsung, Android), Celular (iOS, Android), Notebook e Tablet.
    */
   public playVoice(type: 'exercicio' | 'descansar') {
     if (this.isMuted || !this.voiceEnabled) return;
@@ -114,35 +134,56 @@ class SoundService {
     const url = type === 'exercicio' ? exercicioAudioUrl : descansarAudioUrl;
     let played = false;
 
-    // 1. Tocar via elemento HTML5 Audio nativo (compatibilidade máxima com TVs)
-    const audio = this.audioElements[url] || this.preloadAudio(url);
-    if (audio) {
+    // 1. Tocar via Web Audio API com ganho amplificado para cortar o ruído ambiente do tatame
+    if (this.ctx && this.audioBuffers[url]) {
       try {
-        audio.currentTime = 0;
-        const playPromise = audio.play();
-        if (playPromise !== undefined) {
-          playPromise.then(() => {
-            played = true;
-          }).catch(() => {
-            // Se falhar (ex: bloqueio de autoplay), tenta fallback
-            this.speakFallback(type === 'exercicio' ? 'Exercício!' : 'Descansar!');
-          });
-        } else {
-          played = true;
-        }
+        const source = this.ctx.createBufferSource();
+        source.buffer = this.audioBuffers[url];
+
+        const gainNode = this.ctx.createGain();
+        gainNode.gain.setValueAtTime(1.4, this.ctx.currentTime); // +40% de presença sonora
+
+        source.connect(gainNode);
+        gainNode.connect(this.getMasterOutput());
+        source.start(0);
+        played = true;
       } catch {
-        this.speakFallback(type === 'exercicio' ? 'Exercício!' : 'Descansar!');
+        played = false;
       }
     }
 
-    // 2. Se o áudio não tocou, dispara o sintetizador de voz como fallback
+    // 2. Se o Web Audio não tocou, toca via elemento HTML5 Audio nativo (compatibilidade máxima com TVs antigas)
+    if (!played) {
+      const audio = this.audioElements[url] || this.preloadAudio(url);
+      if (audio) {
+        try {
+          audio.currentTime = 0;
+          audio.volume = 1.0;
+          const playPromise = audio.play();
+          if (playPromise !== undefined) {
+            playPromise.then(() => {
+              played = true;
+            }).catch(() => {
+              // Se falhar (ex: bloqueio de autoplay), tenta fallback estritamente masculino
+              this.speakFallback(type === 'exercicio' ? 'Exercício!' : 'Descansar!');
+            });
+          } else {
+            played = true;
+          }
+        } catch {
+          this.speakFallback(type === 'exercicio' ? 'Exercício!' : 'Descansar!');
+        }
+      }
+    }
+
+    // 3. Fallback final se necessário
     if (!played) {
       this.speakFallback(type === 'exercicio' ? 'Exercício!' : 'Descansar!');
     }
   }
 
   /**
-   * Fallback de síntese vocal para navegadores que suportam Web Speech API
+   * Fallback de síntese vocal ESTRITAMENTE MASCULINA em Português
    */
   private speakFallback(text: string) {
     if (this.isMuted || !this.voiceEnabled) return;
@@ -151,8 +192,28 @@ class SoundService {
         window.speechSynthesis.cancel();
         const utterance = new SpeechSynthesisUtterance(text);
         utterance.lang = 'pt-BR';
-        utterance.rate = 1.05;
-        utterance.pitch = 0.95;
+        
+        // Buscar estritamente voz masculina em português
+        const voices = window.speechSynthesis.getVoices();
+        const maleVoice = voices.find(v => 
+          (v.lang.startsWith('pt') || v.lang.includes('BR')) &&
+          (v.name.toLowerCase().includes('antonio') ||
+           v.name.toLowerCase().includes('daniel') ||
+           v.name.toLowerCase().includes('male') ||
+           v.name.toLowerCase().includes('homem') ||
+           v.name.toLowerCase().includes('felipe') ||
+           v.name.toLowerCase().includes('jorge'))
+        );
+
+        if (maleVoice) {
+          utterance.voice = maleVoice;
+        } else {
+          // Forçar tom grave imponente
+          utterance.pitch = 0.72;
+        }
+
+        utterance.rate = 1.02;
+        utterance.volume = 1.0;
         window.speechSynthesis.speak(utterance);
       } catch {}
     }
@@ -253,13 +314,13 @@ class SoundService {
 
     // Sequência de 3 toques nítidos de ringue de combate:
     playStrike(0, false);
-    playStrike(0.28, false);
-    playStrike(0.56, true);
+    playStrike(0.26, false);
+    playStrike(0.52, true);
 
-    // Voz oficial: "Exercício!"
+    // Voz oficial masculina imponente: "Exercício!"
     setTimeout(() => {
       this.playVoice('exercicio');
-    }, 650);
+    }, 750);
   }
 
   /**
@@ -381,7 +442,7 @@ class SoundService {
 
   /**
    * Toca a Buzina de Fim de Round (Buzina estridente clássica de arena)
-   * e anuncia por voz "Descansar!" garantido para Smart TV e celular.
+   * e anuncia com a voz masculina imponente "Descansar!" garantido para Smart TV, celular, notebook e tablet.
    */
   public playEndHorn() {
     this.vibrate([400, 100, 400]);
@@ -391,7 +452,7 @@ class SoundService {
 
     const output = this.getMasterOutput();
     const now = this.ctx.currentTime;
-    const duration = 1.7;
+    const duration = 0.95; // Buzina de arena firme (0.95s) que abre espaço imediato para a voz
 
     const freqA = 220;
     const freqB = 224;
@@ -409,7 +470,7 @@ class SoundService {
 
       gainNode.gain.setValueAtTime(0.0, now);
       gainNode.gain.linearRampToValueAtTime(0.85, now + 0.03);
-      gainNode.gain.setValueAtTime(0.85, now + duration - 0.2);
+      gainNode.gain.setValueAtTime(0.85, now + duration - 0.15);
       gainNode.gain.linearRampToValueAtTime(0.001, now + duration);
 
       osc.connect(filter);
@@ -420,10 +481,11 @@ class SoundService {
       osc.stop(now + duration);
     });
 
-    // Voz oficial de fim de round: "Descansar!"
+    // Voz oficial masculina imponente: "Descansar!"
+    // Toca exatamente ao término da buzina para clareza máxima e impacto no tatame
     setTimeout(() => {
       this.playVoice('descansar');
-    }, 600);
+    }, 980);
   }
 
   /**
