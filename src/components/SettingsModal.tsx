@@ -182,10 +182,10 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
           <div className="pt-2 border-t border-zinc-800 flex items-center justify-between">
             <div>
               <span className="block text-zinc-200 text-xs sm:text-sm font-semibold">
-                🎙️ Voz do Árbitro em Português
+                🎙️ Voz de Comando em Português
               </span>
               <span className="text-zinc-500 text-[11px] block">
-                Comandos de voz: "Combate!", "Dez segundos!" e "Parou!"
+                Comandos de voz: "Exercício!" e "Descansar!"
               </span>
             </div>
             <button
@@ -194,7 +194,7 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
                 const next = !voiceEnabled;
                 setVoiceEnabled(next);
                 soundService.setVoiceEnabled(next);
-                if (next) soundService.speak('Combate!');
+                if (next) soundService.speak('Exercício!');
               }}
               className={`px-3 py-1.5 rounded-xl border font-bold text-xs transition active:scale-95 ${
                 voiceEnabled
@@ -210,7 +210,7 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
           <div className="pt-2 border-t border-zinc-800">
             <label className="block text-zinc-300 text-xs font-semibold mb-2 flex items-center gap-1.5">
               <Volume2 className="w-4 h-4 text-emerald-400" />
-              <span>Testar Alertas Sonoros da TV / Caixa de Som</span>
+              <span>Testar Alertas Sonoros e Vozes</span>
             </label>
             <div className="grid grid-cols-2 gap-2">
               <button
@@ -218,28 +218,28 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
                 onClick={() => soundService.playStartGong()}
                 className="px-3 py-2 rounded-xl bg-emerald-950/40 hover:bg-emerald-900/50 border border-emerald-500/40 text-emerald-300 text-xs font-bold transition flex items-center justify-center gap-1.5 active:scale-95 shadow-sm"
               >
-                <span>🔔 Início (Sino + Gongo)</span>
+                <span>🔔 Início ("Exercício!")</span>
               </button>
               <button
                 type="button"
-                onClick={() => soundService.playClapper()}
+                onClick={() => soundService.playWhistleAlert(true)}
                 className="px-3 py-2 rounded-xl bg-amber-950/40 hover:bg-amber-900/50 border border-amber-500/40 text-amber-300 text-xs font-bold transition flex items-center justify-center gap-1.5 active:scale-95 shadow-sm"
               >
-                <span>🪵 10s (Clapper)</span>
+                <span>📢 Apito de Alerta</span>
               </button>
               <button
                 type="button"
                 onClick={() => soundService.playEndHorn()}
                 className="px-3 py-2 rounded-xl bg-rose-950/40 hover:bg-rose-900/50 border border-rose-500/40 text-rose-300 text-xs font-bold transition flex items-center justify-center gap-1.5 active:scale-95 shadow-sm"
               >
-                <span>🚨 Fim (Buzina)</span>
+                <span>🚨 Fim ("Descansar!")</span>
               </button>
               <button
                 type="button"
-                onClick={() => soundService.playRestEndChime()}
+                onClick={() => soundService.playClapper()}
                 className="px-3 py-2 rounded-xl bg-blue-950/40 hover:bg-blue-900/50 border border-blue-500/40 text-blue-300 text-xs font-bold transition flex items-center justify-center gap-1.5 active:scale-95 shadow-sm"
               >
-                <span>🎵 Fim Descanso</span>
+                <span>🪵 Batedor 10s</span>
               </button>
             </div>
           </div>

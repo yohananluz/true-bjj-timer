@@ -8,7 +8,13 @@
 class SoundService {
   private ctx: AudioContext | null = null;
   private isMuted: boolean = false;
-  private voiceEnabled: boolean = false;
+  private voiceEnabled: boolean = (() => {
+    try {
+      const saved = localStorage.getItem('bjj_timer_voice_enabled');
+      if (saved !== null) return JSON.parse(saved);
+    } catch {}
+    return true; // Voz ativada por padrão
+  })();
   private masterCompressor: DynamicsCompressorNode | null = null;
 
   private initContext() {
@@ -49,6 +55,9 @@ class SoundService {
 
   public setVoiceEnabled(enabled: boolean) {
     this.voiceEnabled = enabled;
+    try {
+      localStorage.setItem('bjj_timer_voice_enabled', JSON.stringify(enabled));
+    } catch {}
   }
 
   public getVoiceEnabled(): boolean {
@@ -177,10 +186,10 @@ class SoundService {
     // Toque 3: DIIIIINGGGG! (560ms depois, com gongo de dojo longo sustentado)
     playStrike(0.56, true);
 
-    // Voz do árbitro oficial: "Combate!"
+    // Voz do árbitro oficial: "Exercício!"
     setTimeout(() => {
-      this.speak('Combate!');
-    }, 900);
+      this.speak('Exercício!');
+    }, 700);
   }
 
   /**
@@ -281,6 +290,11 @@ class SoundService {
       osc.start(now);
       osc.stop(now + duration);
     });
+
+    // Voz de arbitragem ao terminar o round: "Descansar!"
+    setTimeout(() => {
+      this.speak('Descansar!');
+    }, 600);
   }
 
   /**
@@ -315,6 +329,60 @@ class SoundService {
 
       osc.start(now);
       osc.stop(now + duration);
+    });
+  }
+
+  /**
+   * Apito de Alerta Esportivo (estilo árbitro / timer)
+   * Dispara um apito nítido e penetrante para contagem regressiva de segundos
+   */
+  public playWhistleAlert(isFinal: boolean = false) {
+    this.vibrate(isFinal ? 120 : 60);
+    if (this.isMuted) return;
+    this.initContext();
+    if (!this.ctx) return;
+
+    const output = this.getMasterOutput();
+    const now = this.ctx.currentTime;
+    const duration = isFinal ? 0.28 : 0.16;
+
+    // Frequências penetrantes características de apito esportivo
+    const baseFreq = isFinal ? 2800 : 2550;
+    const secondFreq = isFinal ? 3100 : 2820;
+
+    [baseFreq, secondFreq].forEach((freq) => {
+      const osc = this.ctx!.createOscillator();
+      const gainNode = this.ctx!.createGain();
+
+      osc.type = 'sine';
+      osc.frequency.setValueAtTime(freq, now);
+
+      // Tremolo / modulação rápida simulando o ar do apito (36Hz)
+      const lfo = this.ctx!.createOscillator();
+      const lfoGain = this.ctx!.createGain();
+      lfo.frequency.setValueAtTime(36, now);
+      lfoGain.gain.setValueAtTime(0.2, now);
+      lfo.connect(lfoGain.gain);
+
+      // Envelope percussivo de apito
+      gainNode.gain.setValueAtTime(0.001, now);
+      gainNode.gain.linearRampToValueAtTime(0.75, now + 0.015);
+      gainNode.gain.setValueAtTime(0.75, now + duration - 0.03);
+      gainNode.gain.exponentialRampToValueAtTime(0.0001, now + duration);
+
+      const filter = this.ctx!.createBiquadFilter();
+      filter.type = 'bandpass';
+      filter.frequency.setValueAtTime((baseFreq + secondFreq) / 2, now);
+      filter.Q.setValueAtTime(3.5, now);
+
+      osc.connect(gainNode);
+      gainNode.connect(filter);
+      filter.connect(output);
+
+      osc.start(now);
+      lfo.start(now);
+      osc.stop(now + duration);
+      lfo.stop(now + duration);
     });
   }
 

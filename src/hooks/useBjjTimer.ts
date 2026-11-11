@@ -20,6 +20,8 @@ export function useBjjTimer(initialConfig: TimerConfig) {
   const remainingMsRef = useRef<number>(initialConfig.rollTime * 1000);
   const lastClapperPlayedRoundRef = useRef<number | null>(null);
   const lastCountdownBeepRef = useRef<number | null>(null);
+  const lastPrepareWhistleSecRef = useRef<number | null>(null);
+  const lastWarningWhistleSecRef = useRef<number | null>(null);
   const timerIntervalRef = useRef<number | null>(null);
 
   // Atualizar quando a config mudar se estiver no estado 'idle'
@@ -84,6 +86,8 @@ export function useBjjTimer(initialConfig: TimerConfig) {
       lastClapperPlayedRoundRef.current = null;
     }
     lastCountdownBeepRef.current = null;
+    lastPrepareWhistleSecRef.current = null;
+    lastWarningWhistleSecRef.current = null;
   }, [config, currentRound]);
 
   // Avançar para próximo passo do treino
@@ -137,20 +141,24 @@ export function useBjjTimer(initialConfig: TimerConfig) {
       setTimeRemaining(secondsLeft);
       remainingMsRef.current = diffMs;
 
-      // Alerta de Contagem regressiva (3, 2, 1) em Preparação
-      if (phase === 'prepare' && secondsLeft <= 3 && secondsLeft > 0) {
-        if (lastCountdownBeepRef.current !== secondsLeft) {
-          lastCountdownBeepRef.current = secondsLeft;
-          soundService.playCountdownBeep(false);
+      // 1. Apito de Alerta nos últimos 5 segundos do Tempo de Preparo (5, 4, 3, 2, 1)
+      if (phase === 'prepare' && secondsLeft <= 5 && secondsLeft > 0) {
+        if (lastPrepareWhistleSecRef.current !== secondsLeft) {
+          lastPrepareWhistleSecRef.current = secondsLeft;
+          soundService.playWhistleAlert(secondsLeft === 1);
         }
       }
 
-      // Alerta do Batedor de Madeira (10 segundos para o fim do rola)
-      if ((phase === 'roll' || phase === 'warning') && secondsLeft <= config.warningTime && secondsLeft > 0) {
+      // 2. Apito de Alerta a cada segundo nos 10 segundos finais de cada round (10, 9, 8, 7, 6, 5, 4, 3, 2, 1)
+      if ((phase === 'roll' || phase === 'warning') && secondsLeft <= 10 && secondsLeft > 0) {
         if (phase !== 'warning') {
           setPhase('warning');
         }
-        if (lastClapperPlayedRoundRef.current !== currentRound) {
+        if (lastWarningWhistleSecRef.current !== secondsLeft) {
+          lastWarningWhistleSecRef.current = secondsLeft;
+          soundService.playWhistleAlert(secondsLeft === 1);
+        }
+        if (secondsLeft === 10 && lastClapperPlayedRoundRef.current !== currentRound) {
           lastClapperPlayedRoundRef.current = currentRound;
           soundService.playClapper();
         }
@@ -235,6 +243,8 @@ export function useBjjTimer(initialConfig: TimerConfig) {
     endTimeRef.current = null;
     lastClapperPlayedRoundRef.current = null;
     lastCountdownBeepRef.current = null;
+    lastPrepareWhistleSecRef.current = null;
+    lastWarningWhistleSecRef.current = null;
   }, [config.rollTime]);
 
   // Pular para o próximo round ou fase
